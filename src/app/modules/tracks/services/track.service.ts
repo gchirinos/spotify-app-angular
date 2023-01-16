@@ -42,7 +42,7 @@ export class TrackService {
   getAllRandom$(): Observable<any> {
     return this.httpClient.get(`${this.URL}/tracks`)
     .pipe(
-      mergeMap(({ data }: any) => this.skipById(data, 2)),
+      mergeMap(({ data }: any) => this.skipById(data, 0)),
       // map((dataRevertida) => {
       //   return dataRevertida.filter((track: TrackModel) => track._id != 1)
       // })

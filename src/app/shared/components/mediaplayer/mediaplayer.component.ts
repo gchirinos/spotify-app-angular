@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TrackModel } from '../../../core/models/tracks.model';
 import { MultimediaService } from '../../services/multimedia.service';
@@ -9,31 +9,34 @@ import { MultimediaService } from '../../services/multimedia.service';
   styleUrls: ['./mediaplayer.component.css']
 })
 export class MediaplayerComponent implements OnInit, OnDestroy {
-  mockCover: TrackModel = {
-    cover: 'https://res.cloudinary.com/dwzmsvp7f/image/fetch/q_75,f_auto,w_1316/https:%2F%2Fmedia.insider.in%2F%2Fimage%2Fupload%2Fc_crop%2Cg_custom%2Fv1554712022%2Fygmdapibzpwe00xraeir.png',
-    album: 'Gioli & Assi',
-    name: 'Bebe (Remix)',
-    url:'https://localhost/track.mp3',
-    _id: 1
-  }
 
-  listObservers$: Array<Subscription> = []
+  @ViewChild('progressBar') progressBar:ElementRef = new ElementRef('');
+  listObservers$: Array<Subscription> = [];
+  state: string = 'paused';
 
-  constructor(private multimediaService: MultimediaService) { }
+  constructor(public multimediaService: MultimediaService) { }
 
   ngOnInit(): void {
-    const observer1$: Subscription = this.multimediaService.callBack.subscribe(
-      (resposne: TrackModel) => {
-        console.log('recibiendo cancion.....', resposne);
-      });
 
-      this.listObservers$ = [observer1$];
+    const observer1$ = this.multimediaService.playerStatu$
+    .subscribe(status => this.state = status);
+
+    this.listObservers$ = [observer1$];
+    
   }
 
-  
   ngOnDestroy(): void {
     this.listObservers$.forEach(u => u.unsubscribe());
-    console.log('✌✌✌✌');
+    console.log('✌✌✌✌ BOOM!');
+  }
+
+  handlePosition(event: MouseEvent): void {
+    const elNative: HTMLElement = this.progressBar.nativeElement;
+    const { clientX } = event;
+    const { x, width } = elNative.getBoundingClientRect();
+    const clickX = clientX - x;
+    const percetageFromX = (clickX * 100) / width;
+    this.multimediaService.seekAudio(percetageFromX);
   }
 
 }

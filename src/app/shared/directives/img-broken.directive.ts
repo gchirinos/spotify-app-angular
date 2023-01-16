@@ -11,9 +11,7 @@ export class ImgBrokenDirective {
     elementNativo.src = '../../../assets/images/broken-1.png';
   }
 
-  constructor(private elHost: ElementRef) { 
-    console.log(elHost);
-
+  constructor(private elHost: ElementRef) {
   }
 
 }
